@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmileReader - 跨平台阅读软件</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="navbar">
+        <div class="navbar-brand">
+            <i class="fas fa-book-open"></i>
+            <h1>SmileReader</h1>
+        </div>
+        <nav class="navbar-nav">
+            <a href="index.html" class="nav-item active">
+                <i class="fas fa-bookcase"></i>
+                <span>书架</span>
+            </a>
+            <a href="file-manager.html" class="nav-item">
+                <i class="fas fa-folder-open"></i>
+                <span>文件</span>
+            </a>
+            <a href="notes.html" class="nav-item">
+                <i class="fas fa-sticky-note"></i>
+                <span>笔记</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>设置</span>
+            </a>
+        </nav>
+        <div class="navbar-actions">
+            <button class="btn-icon">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- 移动端底部导航 -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item active">
+            <i class="fas fa-bookcase"></i>
+            <span>书架</span>
+        </a>
+        <a href="file-manager.html" class="nav-item">
+            <i class="fas fa-folder-open"></i>
+            <span>文件</span>
+        </a>
+        <a href="reader.html" class="nav-item add-book">
+            <i class="fas fa-plus"></i>
+        </a>
+        <a href="notes.html" class="nav-item">
+            <i class="fas fa-sticky-note"></i>
+            <span>笔记</span>
+        </a>
+        <a href="settings.html" class="nav-item">
+            <i class="fas fa-cog"></i>
+            <span>设置</span>
+        </a>
+    </nav>
+
+    <!-- 主内容区域 -->
+    <main class="main-content">
+        <!-- 最近阅读 -->
+        <section class="section">
+            <div class="section-header">
+                <h2>最近阅读</h2>
+                <a href="file-manager.html" class="see-all">查看全部</a>
+            </div>
+            <div class="recent-books">
+                <div class="book-card" onclick="window.location.href='reader.html'">
+                    <div class="book-cover">
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=modern%20book%20cover%20design%20with%20blue%20and%20white%20colors&image_size=square" alt="深入理解计算机系统">
+                        <div class="reading-progress">
+                            <div class="progress-bar" style="width: 65%"></div>
+                        </div>
+                    </div>
+                    <h3>深入理解计算机系统</h3>
+                    <p class="book-meta">Randal E. Bryant</p>
+                    <p class="book-progress">65% 完成</p>
+                </div>
+                <div class="book-card" onclick="window.location.href='reader.html'">
+                    <div class="book-cover">
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=classic%20novel%20book%20cover%20with%20red%20theme&image_size=square" alt="百年孤独">
+                        <div class="reading-progress">
+                            <div class="progress-bar" style="width: 32%"></div>
+                        </div>
+                    </div>
+                    <h3>百年孤独</h3>
+                    <p class="book-meta">加西亚·马尔克斯</p>
+                    <p class="book-progress">32% 完成</p>
+                </div>
+                <div class="book-card" onclick="window.location.href='reader.html'">
+                    <div class="book-cover">
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=business%20book%20cover%20with%20gold%20elements&image_size=square" alt="原则">
+                        <div class="reading-progress">
+                            <div class="progress-bar" style="width: 87%"></div>
+                        </div>
+                    </div>
+                    <h3>原则</h3>
+                    <p class="book-meta">瑞·达利欧</p>
+                    <p class="book-progress">87% 完成</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 书架视图 -->
+        <section class="section">
+            <div class="section-header">
+                <h2>我的书架</h2>
+                <div class="view-options">
+                    <button class="btn-icon active">
+                        <i class="fas fa-th-large"></i>
+                    </button>
+                    <button class="btn-icon">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="bookshelf">
+                <div class="book-item" onclick="window.location.href='reader.html'">
+                    <div class="book-cover">
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=science%20fiction%20book%20cover%20with%20space%20theme&image_size=square" alt="三体">
+                    </div>
+                    <h3>三体</h3>
+                    <p class="book-meta">刘慈欣</p>
+                </div>
+                <div class="book-item" onclick="window.location.href='reader.html'">
+                    <div class="book-cover">
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=philosophy%20book%20cover%20with%20ancient%20greek%20elements&image_size=square" alt="苏菲的世界">
+                    </div>
+                    <h3>苏菲的世界</h3>
+                    <p class="book-meta">乔斯坦·贾德</p>
+                </div>
+                <div class="book-item" onclick="window.location.href='reader.html'">
+                    <div class="book-cover">
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=romance%20novel%20book%20cover%20with%20pink%20theme&image_size=square" alt="傲慢与偏见">
+                    </div>
+                    <h3>傲慢与偏见</h3>
+                    <p class="book-meta">简·奥斯汀</p>
+                </div>
+                <div class="book-item" onclick="window.location.href='reader.html'">
+                    <div class="book-cover">
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=fantasy%20novel%20book%20cover%20with%20magical%20elements&image_size=square" alt="哈利·波特">
+                    </div>
+                    <h3>哈利·波特</h3>
+                    <p class="book-meta">J.K.罗琳</p>
+                </div>
+                <div class="book-item" onclick="window.location.href='reader.html'">
+                    <div class="book-cover">
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=history%20book%20cover%20with%20ancient%20scrolls&image_size=square" alt="人类简史">
+                    </div>
+                    <h3>人类简史</h3>
+                    <p class="book-meta">尤瓦尔·赫拉利</p>
+                </div>
+                <div class="book-item" onclick="window.location.href='reader.html'">
+                    <div class="book-cover">
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=biography%20book%20cover%20with%20portrait&image_size=square" alt="史蒂夫·乔布斯传">
+                    </div>
+                    <h3>史蒂夫·乔布斯传</h3>
+                    <p class="book-meta">沃尔特·艾萨克森</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 推荐内容 -->
+        <section class="section">
+            <div class="section-header">
+                <h2>为你推荐</h2>
+            </div>
+            <div class="recommended-books">
+                <div class="book-card" onclick="window.location.href='reader.html'">
+                    <div class="book-cover">
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=psychology%20book%20cover%20with%20blue%20waves&image_size=square" alt="思考，快与慢">
+                    </div>
+                    <h3>思考，快与慢</h3>
+                    <p class="book-meta">丹尼尔·卡尼曼</p>
+                    <p class="book-desc">了解大脑的思考机制，做出更明智的决策</p>
+                </div>
+                <div class="book-card" onclick="window.location.href='reader.html'">
+                    <div class="book-cover">
+                        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=technology%20book%20cover%20with%20circuit%20patterns&image_size=square" alt="未来简史">
+                    </div>
+                    <h3>未来简史</h3>
+                    <p class="book-meta">尤瓦尔·赫拉利</p>
+                    <p class="book-desc">探索人类未来的发展趋势和可能的命运</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

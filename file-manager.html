@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件管理 - SmileReader</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="navbar">
+        <div class="navbar-brand">
+            <button class="btn-icon" onclick="window.location.href='index.html'">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1>文件管理</h1>
+        </div>
+        <div class="navbar-actions">
+            <button class="btn-primary" id="import-btn">
+                <i class="fas fa-upload"></i>
+                <span>导入文件</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- 移动端底部导航 -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fas fa-bookcase"></i>
+            <span>书架</span>
+        </a>
+        <a href="file-manager.html" class="nav-item active">
+            <i class="fas fa-folder-open"></i>
+            <span>文件</span>
+        </a>
+        <a href="reader.html" class="nav-item add-book">
+            <i class="fas fa-plus"></i>
+        </a>
+        <a href="notes.html" class="nav-item">
+            <i class="fas fa-sticky-note"></i>
+            <span>笔记</span>
+        </a>
+        <a href="settings.html" class="nav-item">
+            <i class="fas fa-cog"></i>
+            <span>设置</span>
+        </a>
+    </nav>
+
+    <!-- 主内容区域 -->
+    <main class="main-content">
+        <!-- 搜索和筛选 -->
+        <div class="search-filter-bar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="搜索文件...">
+            </div>
+            <button class="btn-icon" id="filter-btn">
+                <i class="fas fa-filter"></i>
+            </button>
+        </div>
+
+        <!-- 工具栏 -->
+        <div class="toolbar">
+            <div class="view-controls">
+                <button class="btn-icon active" id="list-view-btn">
+                    <i class="fas fa-list"></i>
+                </button>
+                <button class="btn-icon" id="grid-view-btn">
+                    <i class="fas fa-th-large"></i>
+                </button>
+            </div>
+            <div class="sort-controls">
+                <select id="sort-select">
+                    <option value="name">名称</option>
+                    <option value="size">大小</option>
+                    <option value="date">修改时间</option>
+                    <option value="progress">阅读进度</option>
+                </select>
+            </div>
+            <div class="batch-controls" id="batch-controls" style="display: none;">
+                <button class="btn-icon" id="delete-btn">
+                    <i class="fas fa-trash"></i>
+                </button>
+                <button class="btn-icon" id="move-btn">
+                    <i class="fas fa-cut"></i>
+                </button>
+                <button class="btn-icon" id="rename-btn">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-icon" id="cancel-batch-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 分类标签 -->
+        <div class="category-tabs">
+            <button class="tab-btn active">全部</button>
+            <button class="tab-btn">TXT</button>
+            <button class="tab-btn">PDF</button>
+            <button class="tab-btn">EPUB</button>
+            <button class="tab-btn">MOBI</button>
+            <button class="tab-btn">DOCX</button>
+        </div>
+
+        <!-- 文件列表视图 -->
+        <div class="file-list" id="file-list">
+            <div class="file-item">
+                <input type="checkbox" class="file-checkbox">
+                <div class="file-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="file-info">
+                    <h3>深入理解计算机系统.txt</h3>
+                    <p class="file-meta">2.5 MB · 文本文件 · 最近修改: 2026-02-20</p>
+                    <div class="file-progress">
+                        <div class="progress-bar" style="width: 65%"></div>
+                        <span>65%</span>
+                    </div>
+                </div>
+                <div class="file-actions">
+                    <button class="btn-icon">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="file-item">
+                <input type="checkbox" class="file-checkbox">
+                <div class="file-icon pdf">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <div class="file-info">
+                    <h3>设计模式.pdf</h3>
+                    <p class="file-meta">4.8 MB · PDF文件 · 最近修改: 2026-02-19</p>
+                    <div class="file-progress">
+                        <div class="progress-bar" style="width: 42%"></div>
+                        <span>42%</span>
+                    </div>
+                </div>
+                <div class="file-actions">
+                    <button class="btn-icon">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="file-item">
+                <input type="checkbox" class="file-checkbox">
+                <div class="file-icon epub">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="file-info">
+                    <h3>百年孤独.epub</h3>
+                    <p class="file-meta">1.2 MB · EPUB文件 · 最近修改: 2026-02-18</p>
+                    <div class="file-progress">
+                        <div class="progress-bar" style="width: 32%"></div>
+                        <span>32%</span>
+                    </div>
+                </div>
+                <div class="file-actions">
+                    <button class="btn-icon">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="file-item">
+                <input type="checkbox" class="file-checkbox">
+                <div class="file-icon mobi">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <div class="file-info">
+                    <h3>三体.mobi</h3>
+                    <p class="file-meta">1.8 MB · MOBI文件 · 最近修改: 2026-02-17</p>
+                    <div class="file-progress">
+                        <div class="progress-bar" style="width: 100%"></div>
+                        <span>100%</span>
+                    </div>
+                </div>
+                <div class="file-actions">
+                    <button class="btn-icon">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="file-item">
+                <input type="checkbox" class="file-checkbox">
+                <div class="file-icon docx">
+                    <i class="fas fa-file-word"></i>
+                </div>
+                <div class="file-info">
+                    <h3>项目计划书.docx</h3>
+                    <p class="file-meta">3.1 MB · Word文件 · 最近修改: 2026-02-16</p>
+                    <div class="file-progress">
+                        <div class="progress-bar" style="width: 0%"></div>
+                        <span>0%</span>
+                    </div>
+                </div>
+                <div class="file-actions">
+                    <button class="btn-icon">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 网格视图 (默认隐藏) -->
+        <div class="file-grid" id="file-grid" style="display: none;">
+            <div class="file-card">
+                <div class="file-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <h3>深入理解计算机系统.txt</h3>
+                <p class="file-meta">2.5 MB</p>
+                <div class="file-progress">
+                    <div class="progress-bar" style="width: 65%"></div>
+                </div>
+            </div>
+            <div class="file-card">
+                <div class="file-icon pdf">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <h3>设计模式.pdf</h3>
+                <p class="file-meta">4.8 MB</p>
+                <div class="file-progress">
+                    <div class="progress-bar" style="width: 42%"></div>
+                </div>
+            </div>
+            <div class="file-card">
+                <div class="file-icon epub">
+                    <i class="fas fa-book"></i>
+                </div>
+                <h3>百年孤独.epub</h3>
+                <p class="file-meta">1.2 MB</p>
+                <div class="file-progress">
+                    <div class="progress-bar" style="width: 32%"></div>
+                </div>
+            </div>
+            <div class="file-card">
+                <div class="file-icon mobi">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <h3>三体.mobi</h3>
+                <p class="file-meta">1.8 MB</p>
+                <div class="file-progress">
+                    <div class="progress-bar" style="width: 100%"></div>
+                </div>
+            </div>
+            <div class="file-card">
+                <div class="file-icon docx">
+                    <i class="fas fa-file-word"></i>
+                </div>
+                <h3>项目计划书.docx</h3>
+                <p class="file-meta">3.1 MB</p>
+                <div class="file-progress">
+                    <div class="progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

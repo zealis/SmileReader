@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阅读视图 - SmileReader</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="reader-mode">
+    <!-- 阅读视图顶部工具栏 -->
+    <div class="reader-toolbar top">
+        <button class="btn-icon" onclick="window.location.href='index.html'">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h1 class="book-title">深入理解计算机系统</h1>
+        <div class="toolbar-actions">
+            <button class="btn-icon" id="toc-btn">
+                <i class="fas fa-list"></i>
+            </button>
+            <button class="btn-icon" id="search-btn">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 阅读控制菜单 (默认隐藏) -->
+    <div class="reader-controls" id="reader-controls" style="display: none;">
+        <div class="controls-header">
+            <h2>阅读设置</h2>
+            <button class="btn-icon" id="close-controls-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <!-- 字体大小调整 -->
+        <div class="control-group">
+            <label>字体大小</label>
+            <div class="font-size-controls">
+                <button class="btn-icon" id="decrease-font-btn">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <span id="font-size-value">16px</span>
+                <button class="btn-icon" id="increase-font-btn">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 字体类型选择 -->
+        <div class="control-group">
+            <label>字体类型</label>
+            <select id="font-family-select">
+                <option value="system">系统默认</option>
+                <option value="serif">衬线字体</option>
+                <option value="sans-serif">无衬线字体</option>
+                <option value="monospace">等宽字体</option>
+            </select>
+        </div>
+
+        <!-- 行间距设置 -->
+        <div class="control-group">
+            <label>行间距</label>
+            <input type="range" min="1" max="2" step="0.1" value="1.5" id="line-height-slider">
+            <span id="line-height-value">1.5</span>
+        </div>
+
+        <!-- 主题切换 -->
+        <div class="control-group">
+            <label>主题</label>
+            <div class="theme-buttons">
+                <button class="theme-btn active" data-theme="light">
+                    <i class="fas fa-sun"></i>
+                    <span>浅色</span>
+                </button>
+                <button class="theme-btn" data-theme="dark">
+                    <i class="fas fa-moon"></i>
+                    <span>深色</span>
+                </button>
+                <button class="theme-btn" data-theme="night">
+                    <i class="fas fa-star"></i>
+                    <span>夜间</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 页面布局 -->
+        <div class="control-group">
+            <label>页面布局</label>
+            <div class="layout-buttons">
+                <button class="layout-btn active" data-layout="single">
+                    <i class="fas fa-columns"></i>
+                    <span>单页</span>
+                </button>
+                <button class="layout-btn" data-layout="double">
+                    <i class="fas fa-copy"></i>
+                    <span>双页</span>
+                </button>
+                <button class="layout-btn" data-layout="scroll">
+                    <i class="fas fa-sort"></i>
+                    <span>滚动</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 阅读内容区域 -->
+    <div class="reader-content" id="reader-content">
+        <div class="content-wrapper">
+            <h2>第 1 章 计算机系统漫游</h2>
+            <p>计算机系统是由硬件和系统软件组成的，它们共同工作来运行应用程序。虽然系统的具体实现细节会随着时间不断变化，但是系统的基本概念却保持稳定。</p>
+            
+            <h3>1.1 信息就是位 + 上下文</h3>
+            <p>计算机系统中的所有信息——包括磁盘文件、内存中的程序、内存中存放的用户数据以及网络上传送的数据，都是由一串位表示的。位（bit）是计算机中最小的数据单位，它的值为 0 或 1。</p>
+            <p>区分不同数据对象的唯一方法是我们读到这些数据对象时的上下文。比如，在不同的上下文中，同样的字节序列可能表示一个整数、浮点数、字符串或者机器指令。</p>
+            
+            <h3>1.2 程序被其他程序翻译成不同的格式</h3>
+            <p>为了在系统上运行 hello 程序，我们需要把源程序文件 hello.c 翻译成一系列低级机器语言指令。然后这些指令按照一种可执行目标程序的格式打包，并以二进制磁盘文件的形式存放起来。</p>
+            <p>从源文件到可执行文件的转化过程可分为四个阶段，由编译器驱动程序（compiler driver）控制：</p>
+            <ol>
+                <li><strong>预处理阶段</strong>：预处理器（cpp）根据以 # 开头的命令，修改原始的 C 程序。</li>
+                <li><strong>编译阶段</strong>：编译器（cc1）将预处理后的文本文件 hello.i 翻译成文本文件 hello.s，它包含一个汇编语言程序。</li>
+                <li><strong>汇编阶段</strong>：汇编器（as）将 hello.s 翻译成机器语言指令，把这些指令打包成一种叫做可重定位目标程序（relocatable object program）的格式。</li>
+                <li><strong>链接阶段</strong>：链接器（ld）将 hello.o 与其他必要的目标文件组合起来，创建一个可执行目标文件 hello。</li>
+            </ol>
+            
+            <h3>1.3 了解编译系统如何工作是大有益处的</h3>
+            <p>为什么了解编译系统如何工作是大有益处的？原因有很多：</p>
+            <ul>
+                <li>优化程序性能</li>
+                <li>理解链接时出现的错误</li>
+                <li>避免安全漏洞</li>
+                <li>利用已有的工具</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 阅读视图底部工具栏 -->
+    <div class="reader-toolbar bottom">
+        <div class="progress-info">
+            <span id="current-page">15</span>
+            <span>/</span>
+            <span id="total-pages">520</span>
+        </div>
+        <div class="progress-bar-container">
+            <div class="progress-bar" style="width: 65%"></div>
+        </div>
+        <div class="toolbar-actions">
+            <button class="btn-icon" id="bookmark-btn">
+                <i class="fas fa-bookmark"></i>
+            </button>
+            <button class="btn-icon" id="note-btn">
+                <i class="fas fa-pencil"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 目录面板 (默认隐藏) -->
+    <div class="toc-panel" id="toc-panel" style="display: none;">
+        <div class="toc-header">
+            <h2>目录</h2>
+            <button class="btn-icon" id="close-toc-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="toc-content">
+            <ul class="toc-list">
+                <li class="toc-item active">
+                    <a href="#">第 1 章 计算机系统漫游</a>
+                </li>
+                <li class="toc-item">
+                    <a href="#">第 2 章 信息的表示和处理</a>
+                </li>
+                <li class="toc-item">
+                    <a href="#">第 3 章 程序的机器级表示</a>
+                </li>
+                <li class="toc-item">
+                    <a href="#">第 4 章 处理器体系结构</a>
+                </li>
+                <li class="toc-item">
+                    <a href="#">第 5 章 优化程序性能</a>
+                </li>
+                <li class="toc-item">
+                    <a href="#">第 6 章 存储器层次结构</a>
+                </li>
+                <li class="toc-item">
+                    <a href="#">第 7 章 链接</a>
+                </li>
+                <li class="toc-item">
+                    <a href="#">第 8 章 异常控制流</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>笔记与书签 - SmileReader</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="navbar">
+        <div class="navbar-brand">
+            <button class="btn-icon" onclick="window.location.href='index.html'">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1>笔记与书签</h1>
+        </div>
+        <div class="navbar-actions">
+            <button class="btn-icon" id="export-btn">
+                <i class="fas fa-download"></i>
+                <span>导出</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- 移动端底部导航 -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fas fa-bookcase"></i>
+            <span>书架</span>
+        </a>
+        <a href="file-manager.html" class="nav-item">
+            <i class="fas fa-folder-open"></i>
+            <span>文件</span>
+        </a>
+        <a href="reader.html" class="nav-item add-book">
+            <i class="fas fa-plus"></i>
+        </a>
+        <a href="notes.html" class="nav-item active">
+            <i class="fas fa-sticky-note"></i>
+            <span>笔记</span>
+        </a>
+        <a href="settings.html" class="nav-item">
+            <i class="fas fa-cog"></i>
+            <span>设置</span>
+        </a>
+    </nav>
+
+    <!-- 主内容区域 -->
+    <main class="main-content">
+        <!-- 标签页切换 -->
+        <div class="tab-container">
+            <button class="tab-btn active" data-tab="notes">笔记</button>
+            <button class="tab-btn" data-tab="bookmarks">书签</button>
+        </div>
+
+        <!-- 搜索框 -->
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="搜索笔记或书签...">
+        </div>
+
+        <!-- 笔记标签页 -->
+        <div class="tab-content active" id="notes-tab">
+            <!-- 笔记分类 -->
+            <div class="note-categories">
+                <button class="category-btn active">全部</button>
+                <button class="category-btn">高亮</button>
+                <button class="category-btn">注释</button>
+                <button class="category-btn">待办</button>
+            </div>
+
+            <!-- 笔记列表 -->
+            <div class="notes-list">
+                <div class="note-item">
+                    <div class="note-header">
+                        <h3>深入理解计算机系统</h3>
+                        <span class="note-date">2026-02-20</span>
+                    </div>
+                    <div class="note-content">
+                        <p class="note-text">计算机系统中的所有信息——包括磁盘文件、内存中的程序、内存中存放的用户数据以及网络上传送的数据，都是由一串位表示的。</p>
+                        <div class="note-meta">
+                            <span class="note-page">第 15 页</span>
+                            <span class="note-type highlight">高亮</span>
+                        </div>
+                    </div>
+                    <div class="note-actions">
+                        <button class="btn-icon">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="note-item">
+                    <div class="note-header">
+                        <h3>深入理解计算机系统</h3>
+                        <span class="note-date">2026-02-19</span>
+                    </div>
+                    <div class="note-content">
+                        <p class="note-text">从源文件到可执行文件的转化过程可分为四个阶段：预处理、编译、汇编和链接。</p>
+                        <div class="note-meta">
+                            <span class="note-page">第 12 页</span>
+                            <span class="note-type note">注释</span>
+                        </div>
+                    </div>
+                    <div class="note-actions">
+                        <button class="btn-icon">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="note-item">
+                    <div class="note-header">
+                        <h3>百年孤独</h3>
+                        <span class="note-date">2026-02-18</span>
+                    </div>
+                    <div class="note-content">
+                        <p class="note-text">许多年后，奥雷良诺上校站在行刑队面前，准会想起父亲带他去参观冰块的那个遥远的下午。</p>
+                        <div class="note-meta">
+                            <span class="note-page">第 1 页</span>
+                            <span class="note-type highlight">高亮</span>
+                        </div>
+                    </div>
+                    <div class="note-actions">
+                        <button class="btn-icon">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 书签标签页 -->
+        <div class="tab-content" id="bookmarks-tab" style="display: none;">
+            <!-- 书签分类 -->
+            <div class="bookmark-categories">
+                <button class="category-btn active">全部</button>
+                <button class="category-btn">技术书籍</button>
+                <button class="category-btn">文学小说</button>
+                <button class="category-btn">其他</button>
+            </div>
+
+            <!-- 书签列表 -->
+            <div class="bookmarks-list">
+                <div class="bookmark-item">
+                    <div class="bookmark-header">
+                        <h3>深入理解计算机系统</h3>
+                        <span class="bookmark-date">2026-02-20</span>
+                    </div>
+                    <div class="bookmark-content">
+                        <p class="bookmark-text">1.3 了解编译系统如何工作是大有益处的</p>
+                        <div class="bookmark-meta">
+                            <span class="bookmark-page">第 18 页</span>
+                            <span class="bookmark-category">技术书籍</span>
+                        </div>
+                    </div>
+                    <div class="bookmark-actions">
+                        <button class="btn-icon">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="bookmark-item">
+                    <div class="bookmark-header">
+                        <h3>百年孤独</h3>
+                        <span class="bookmark-date">2026-02-19</span>
+                    </div>
+                    <div class="bookmark-content">
+                        <p class="bookmark-text">第 2 章 马孔多的建立</p>
+                        <div class="bookmark-meta">
+                            <span class="bookmark-page">第 35 页</span>
+                            <span class="bookmark-category">文学小说</span>
+                        </div>
+                    </div>
+                    <div class="bookmark-actions">
+                        <button class="btn-icon">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="bookmark-item">
+                    <div class="bookmark-header">
+                        <h3>原则</h3>
+                        <span class="bookmark-date">2026-02-17</span>
+                    </div>
+                    <div class="bookmark-content">
+                        <p class="bookmark-text">生活原则 1：拥抱现实，应对现实</p>
+                        <div class="bookmark-meta">
+                            <span class="bookmark-page">第 45 页</span>
+                            <span class="bookmark-category">其他</span>
+                        </div>
+                    </div>
+                    <div class="bookmark-actions">
+                        <button class="btn-icon">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
