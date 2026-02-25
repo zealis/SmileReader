@@ -43,3 +43,12 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Reference folder
+/参考/
+
+# Trae IDE folder
+/.trae/
+
+# Command line output files
+klist*
