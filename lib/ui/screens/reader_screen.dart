@@ -30,7 +30,13 @@ class _ReaderScreenState extends State<ReaderScreen> {
   double _lineSpacing = 1.5;
   double _margin = 24.0; // 边距设置
   String _theme = 'light';
-  String _pageLayout = 'vertical';
+  String _pageLayout = 'scroll';
+  
+  // 翻页状态
+  bool _isDragging = false;
+  Offset _startPosition = Offset.zero;
+  Offset _currentPosition = Offset.zero;
+  double _dragOffset = 0.0;
 
   @override
   void initState() {
@@ -74,7 +80,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
         _lineSpacing = double.tryParse((settings['lineSpacing'] ?? 1.5).toString()) ?? 1.5;
         _margin = double.tryParse((settings['margin'] ?? 24.0).toString()) ?? 24.0;
         _theme = settings['theme'] ?? 'light';
-        _pageLayout = settings['pageLayout'] ?? 'vertical';
+        _pageLayout = (settings['pageLayout'] ?? 'scroll') == 'vertical' ? 'scroll' : (settings['pageLayout'] ?? 'scroll');
         print('Settings loaded: fontSize $_fontSize, lineSpacing $_lineSpacing, margin $_margin, theme $_theme, layout $_pageLayout');
       } catch (e) {
         print('Error getting settings: $e');
@@ -83,7 +89,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
         _lineSpacing = 1.5;
         _margin = 24.0;
         _theme = 'light';
-        _pageLayout = 'vertical';
+        _pageLayout = 'scroll';
       }
       
       // 检查是否是 EPUB 文件
@@ -411,6 +417,11 @@ class _ReaderScreenState extends State<ReaderScreen> {
     String tempTheme = _theme;
     String tempPageLayout = _pageLayout;
     
+    // 确保默认使用滚动模式
+    if (tempPageLayout == 'vertical') {
+      tempPageLayout = 'scroll';
+    }
+    
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -624,6 +635,17 @@ class _ReaderScreenState extends State<ReaderScreen> {
                         ElevatedButton(
                           onPressed: () {
                             setState(() {
+                              tempPageLayout = 'scroll';
+                            });
+                          },
+                          child: Text('滚动'),
+                          style: tempPageLayout == 'scroll' 
+                              ? ElevatedButton.styleFrom(backgroundColor: Colors.blue) 
+                              : ElevatedButton.styleFrom(backgroundColor: Colors.grey[200], foregroundColor: Colors.black),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
                               tempPageLayout = 'simulation';
                             });
                           },
@@ -640,17 +662,6 @@ class _ReaderScreenState extends State<ReaderScreen> {
                           },
                           child: Text('覆盖'),
                           style: tempPageLayout == 'cover' 
-                              ? ElevatedButton.styleFrom(backgroundColor: Colors.blue) 
-                              : ElevatedButton.styleFrom(backgroundColor: Colors.grey[200], foregroundColor: Colors.black),
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              tempPageLayout = 'scroll';
-                            });
-                          },
-                          child: Text('滚动'),
-                          style: tempPageLayout == 'scroll' 
                               ? ElevatedButton.styleFrom(backgroundColor: Colors.blue) 
                               : ElevatedButton.styleFrom(backgroundColor: Colors.grey[200], foregroundColor: Colors.black),
                         ),
@@ -771,7 +782,8 @@ class _ReaderScreenState extends State<ReaderScreen> {
         break;
     }
     
-    return Container(
+    // 创建 EPUB 内容
+    Widget epubContent = Container(
       color: backgroundColor,
       padding: EdgeInsets.all(_margin),
       child: EpubView(
@@ -789,6 +801,157 @@ class _ReaderScreenState extends State<ReaderScreen> {
         ),
       ),
     );
+    
+    // 根据翻页模式包装 EPUB 内容
+    switch (_pageLayout) {
+      case 'simulation':
+        return _buildEpubPageTurnWrapper(epubContent, backgroundColor, textColor, true);
+      case 'cover':
+        return _buildEpubPageTurnWrapper(epubContent, backgroundColor, textColor, false);
+      case 'scroll':
+      default:
+        return epubContent;
+    }
+  }
+  
+  // 构建 EPUB 翻页模式包装器
+  Widget _buildEpubPageTurnWrapper(Widget epubContent, Color backgroundColor, Color textColor, bool isSimulation) {
+    return GestureDetector(
+      onPanStart: (details) {
+        setState(() {
+          _isDragging = true;
+          _startPosition = details.localPosition;
+          _currentPosition = details.localPosition;
+          _dragOffset = 0.0;
+        });
+      },
+      onPanUpdate: (details) {
+        setState(() {
+          _currentPosition = details.localPosition;
+          _dragOffset = details.localPosition.dx - _startPosition.dx;
+        });
+      },
+      onPanEnd: (details) {
+        setState(() {
+          _isDragging = false;
+          double dx = _currentPosition.dx - _startPosition.dx;
+          // 这里我们不调用EpubController的方法，而是通过手势来模拟翻页效果
+          // 实际的页面导航将由EpubView的默认滚动行为处理
+          _startPosition = Offset.zero;
+          _currentPosition = Offset.zero;
+          _dragOffset = 0.0;
+        });
+      },
+      child: Stack(
+        children: [
+          // EPUB 内容
+          epubContent,
+          
+          // 翻页效果
+          if (_isDragging) _buildEpubPageTurnEffect(backgroundColor, textColor, isSimulation),
+        ],
+      ),
+    );
+  }
+  
+  // 构建 EPUB 翻页效果
+  Widget _buildEpubPageTurnEffect(Color backgroundColor, Color textColor, bool isSimulation) {
+    double dx = _currentPosition.dx - _startPosition.dx;
+    double dy = _currentPosition.dy - _startPosition.dy;
+    
+    // 只处理水平滑动
+    if (dx.abs() < dy.abs()) {
+      return Container();
+    }
+    
+    bool isNextPage = dx < 0;
+    double progress = (dx.abs() / MediaQuery.of(context).size.width).clamp(0.0, 1.0);
+    
+    if (isSimulation) {
+      // 仿真翻页效果
+      double angle = isNextPage ? -progress * 1.0 : progress * 1.0;
+      double translateY = (dy / MediaQuery.of(context).size.height) * 50;
+      double shadowOpacity = progress * 0.5;
+      
+      return Positioned(
+        left: 0,
+        top: 0,
+        right: 0,
+        bottom: 0,
+        child: Container(
+          color: backgroundColor,
+          child: Transform(
+            transform: Matrix4.identity()
+              ..setEntry(3, 2, 0.001)
+              ..rotateY(angle)
+              ..translate(isNextPage ? dx * 0.8 : dx * 0.8, translateY, -progress * 100)
+              ..scale(1.0 - progress * 0.05),
+            origin: isNextPage 
+              ? Offset(0, MediaQuery.of(context).size.height / 2)
+              : Offset(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height / 2),
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              color: backgroundColor,
+              child: Center(
+                child: Text(
+                  isNextPage ? '下一页' : '上一页',
+                  style: TextStyle(
+                    fontSize: _fontSize,
+                    color: textColor,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black.withOpacity(shadowOpacity),
+                        offset: Offset(3, 3),
+                        blurRadius: 6,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    } else {
+      // 覆盖翻页效果
+      return Positioned(
+        left: _dragOffset < 0 ? _dragOffset : 0,
+        top: 0,
+        right: _dragOffset < 0 ? 0 : -_dragOffset,
+        bottom: 0,
+        child: Container(
+          color: backgroundColor,
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 50),
+            transform: Matrix4.identity()
+              ..translate(_dragOffset < 0 ? _dragOffset : 0, 0, (_dragOffset.abs() / MediaQuery.of(context).size.width) * -50)
+              ..scale(1.0 + (_dragOffset.abs() / MediaQuery.of(context).size.width) * 0.1),
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              color: backgroundColor,
+              child: Center(
+                child: Text(
+                  isNextPage ? '下一页' : '上一页',
+                  style: TextStyle(
+                    fontSize: _fontSize,
+                    color: textColor,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black.withOpacity((dx.abs() / MediaQuery.of(context).size.width) * 0.4),
+                        offset: Offset(4, 4),
+                        blurRadius: 8,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   // 构建文本阅读器
@@ -946,11 +1109,24 @@ class _ReaderScreenState extends State<ReaderScreen> {
       textColor: textColor,
       content: _content,
       currentPage: _currentPage,
-      onPageChanged: (page) {
+      onPageChanged: (page) async {
         setState(() {
           _currentPage = page;
           _readingProgress = (_currentPage / _totalPages).clamp(0.0, 1.0);
         });
+        
+        // 加载新内容
+        if (_book != null && _book!.format.toLowerCase() != 'epub') {
+          try {
+            String newContent = await _readerService.getContent(widget.bookId, _currentPage);
+            setState(() {
+              _content = newContent;
+            });
+          } catch (e) {
+            print('Error loading content: $e');
+          }
+        }
+        
         _saveProgress();
       },
       fontSize: _fontSize,
@@ -966,11 +1142,24 @@ class _ReaderScreenState extends State<ReaderScreen> {
       textColor: textColor,
       content: _content,
       currentPage: _currentPage,
-      onPageChanged: (page) {
+      onPageChanged: (page) async {
         setState(() {
           _currentPage = page;
           _readingProgress = (_currentPage / _totalPages).clamp(0.0, 1.0);
         });
+        
+        // 加载新内容
+        if (_book != null && _book!.format.toLowerCase() != 'epub') {
+          try {
+            String newContent = await _readerService.getContent(widget.bookId, _currentPage);
+            setState(() {
+              _content = newContent;
+            });
+          } catch (e) {
+            print('Error loading content: $e');
+          }
+        }
+        
         _saveProgress();
       },
       fontSize: _fontSize,
@@ -981,9 +1170,27 @@ class _ReaderScreenState extends State<ReaderScreen> {
   
   // 构建滚动翻页
   Widget _buildScrollPageTurner(Color backgroundColor, Color textColor) {
+    final ScrollController scrollController = ScrollController();
+    
+    scrollController.addListener(() {
+      // 计算滚动进度并更新阅读进度
+      if (scrollController.hasClients) {
+        double maxScrollExtent = scrollController.position.maxScrollExtent;
+        double currentScrollPosition = scrollController.position.pixels;
+        double scrollProgress = maxScrollExtent > 0 ? currentScrollPosition / maxScrollExtent : 0.0;
+        
+        setState(() {
+          _readingProgress = scrollProgress;
+        });
+        
+        _saveProgress();
+      }
+    });
+    
     return Container(
       padding: EdgeInsets.all(_margin),
       child: SingleChildScrollView(
+        controller: scrollController,
         child: Text(
           _content,
           style: TextStyle(
@@ -1022,7 +1229,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
   }
 }
 
-// 仿真翻页组件
+// 仿真翻页组件 - 参考anx-reader实现
 class PageTurnWidget extends StatefulWidget {
   final Color backgroundColor;
   final Color textColor;
@@ -1050,7 +1257,8 @@ class PageTurnWidget extends StatefulWidget {
 }
 
 class _PageTurnWidgetState extends State<PageTurnWidget> {
-  double _dragOffset = 0.0;
+  Offset _startPosition = Offset.zero;
+  Offset _currentPosition = Offset.zero;
   bool _isDragging = false;
   
   @override
@@ -1059,37 +1267,109 @@ class _PageTurnWidgetState extends State<PageTurnWidget> {
       onPanStart: (details) {
         setState(() {
           _isDragging = true;
-          _dragOffset = 0.0;
+          _startPosition = details.localPosition;
+          _currentPosition = details.localPosition;
         });
       },
       onPanUpdate: (details) {
         setState(() {
-          _dragOffset = details.delta.dx;
+          _currentPosition = details.localPosition;
         });
       },
       onPanEnd: (details) {
         setState(() {
           _isDragging = false;
-          if (_dragOffset > 50) {
+          double dx = _currentPosition.dx - _startPosition.dx;
+          if (dx > 50) {
             // 向右滑动，上一页
             widget.onPageChanged(widget.currentPage - 1);
-          } else if (_dragOffset < -50) {
+          } else if (dx < -50) {
             // 向左滑动，下一页
             widget.onPageChanged(widget.currentPage + 1);
           }
-          _dragOffset = 0.0;
+          _startPosition = Offset.zero;
+          _currentPosition = Offset.zero;
         });
       },
-      child: Transform(
-        transform: Matrix4.identity()..translate(_dragOffset * 0.5, 0, 0),
-        child: Container(
-          padding: EdgeInsets.all(widget.margin),
-          child: Text(
-            widget.content,
-            style: TextStyle(
-              fontSize: widget.fontSize,
-              height: widget.lineSpacing,
-              color: widget.textColor,
+      child: Stack(
+        children: [
+          // 主页面
+          Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            color: widget.backgroundColor,
+            padding: EdgeInsets.all(widget.margin),
+            child: Text(
+              widget.content,
+              style: TextStyle(
+                fontSize: widget.fontSize,
+                height: widget.lineSpacing,
+                color: widget.textColor,
+              ),
+            ),
+          ),
+          
+          // 翻页效果
+          if (_isDragging) _buildPageTurnEffect(),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildPageTurnEffect() {
+    double dx = _currentPosition.dx - _startPosition.dx;
+    double dy = _currentPosition.dy - _startPosition.dy;
+    
+    // 只处理水平滑动
+    if (dx.abs() < dy.abs()) {
+      return Container();
+    }
+    
+    bool isNextPage = dx < 0;
+    double progress = (dx.abs() / MediaQuery.of(context).size.width).clamp(0.0, 1.0);
+    
+    // 计算翻页角度和位移
+    double angle = isNextPage ? -progress * 1.0 : progress * 1.0;
+    double translateY = (dy / MediaQuery.of(context).size.height) * 50;
+    
+    // 计算阴影强度
+    double shadowOpacity = progress * 0.5;
+    
+    return Positioned(
+      left: 0,
+      top: 0,
+      right: 0,
+      bottom: 0,
+      child: Container(
+        color: widget.backgroundColor,
+        child: Transform(
+          transform: Matrix4.identity()
+            ..setEntry(3, 2, 0.001)
+            ..rotateY(angle)
+            ..translate(isNextPage ? dx * 0.8 : dx * 0.8, translateY, -progress * 100)
+            ..scale(1.0 - progress * 0.05),
+          origin: isNextPage 
+            ? Offset(0, MediaQuery.of(context).size.height / 2)
+            : Offset(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height / 2),
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            color: widget.backgroundColor,
+            padding: EdgeInsets.all(widget.margin),
+            child: Text(
+              widget.content,
+              style: TextStyle(
+                fontSize: widget.fontSize,
+                height: widget.lineSpacing,
+                color: widget.textColor,
+                shadows: [
+                  Shadow(
+                    color: Colors.black.withOpacity(shadowOpacity),
+                    offset: Offset(3, 3),
+                    blurRadius: 6,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -1098,7 +1378,7 @@ class _PageTurnWidgetState extends State<PageTurnWidget> {
   }
 }
 
-// 覆盖翻页组件
+// 覆盖翻页组件 - 参考anx-reader实现
 class CoverPageTurnWidget extends StatefulWidget {
   final Color backgroundColor;
   final Color textColor;
@@ -1140,7 +1420,7 @@ class _CoverPageTurnWidgetState extends State<CoverPageTurnWidget> {
       },
       onPanUpdate: (details) {
         setState(() {
-          _dragOffset = details.delta.dx;
+          _dragOffset += details.delta.dx;
         });
       },
       onPanEnd: (details) {
@@ -1158,7 +1438,11 @@ class _CoverPageTurnWidgetState extends State<CoverPageTurnWidget> {
       },
       child: Stack(
         children: [
+          // 主页面
           Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            color: widget.backgroundColor,
             padding: EdgeInsets.all(widget.margin),
             child: Text(
               widget.content,
@@ -1169,21 +1453,41 @@ class _CoverPageTurnWidgetState extends State<CoverPageTurnWidget> {
               ),
             ),
           ),
-          if (_isDragging && _dragOffset < 0)
+          
+          // 覆盖翻页效果
+          if (_isDragging)
             Positioned(
-              left: _dragOffset,
+              left: _dragOffset < 0 ? _dragOffset : 0,
               top: 0,
-              right: 0,
+              right: _dragOffset < 0 ? 0 : -_dragOffset,
               bottom: 0,
               child: Container(
                 color: widget.backgroundColor,
-                padding: EdgeInsets.all(widget.margin),
-                child: Text(
-                  widget.content,
-                  style: TextStyle(
-                    fontSize: widget.fontSize,
-                    height: widget.lineSpacing,
-                    color: widget.textColor,
+                child: AnimatedContainer(
+                  duration: Duration(milliseconds: 50),
+                  transform: Matrix4.identity()
+                    ..translate(_dragOffset < 0 ? _dragOffset : 0, 0, (_dragOffset.abs() / MediaQuery.of(context).size.width) * -50)
+                    ..scale(1.0 + (_dragOffset.abs() / MediaQuery.of(context).size.width) * 0.1),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    color: widget.backgroundColor,
+                    padding: EdgeInsets.all(widget.margin),
+                    child: Text(
+                      widget.content,
+                      style: TextStyle(
+                        fontSize: widget.fontSize,
+                        height: widget.lineSpacing,
+                        color: widget.textColor,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withOpacity((_dragOffset.abs() / MediaQuery.of(context).size.width) * 0.4),
+                            offset: Offset(4, 4),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),

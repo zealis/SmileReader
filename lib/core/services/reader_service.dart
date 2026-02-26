@@ -140,38 +140,33 @@ class ReaderService {
     return results;
   }
 
-  // 设置阅读设置
+  // 全局阅读设置
+  Map<String, dynamic>? _globalSettings;
+
+  // 设置阅读设置（全局）
   Future<void> setReadingSettings(String bookId, Map<String, dynamic> settings) async {
-    // 实际需要将设置保存到数据库
-    // 暂时只是一个占位符
+    // 保存为全局设置
+    _globalSettings = settings;
+    print('Global settings saved: $settings');
   }
 
-  // 获取阅读设置
+  // 获取阅读设置（优先使用全局设置）
   Future<Map<String, dynamic>> getReadingSettings(String bookId) async {
-    // 实际需要从数据库获取设置
-    // 暂时返回默认设置
-    try {
-      // 尝试从数据库获取设置
-      // 这里我们返回默认设置，但确保所有数值都是正确类型
-      return {
-        'fontSize': 16.0,
-        'fontFamily': 'System',
-        'lineSpacing': 1.5,
-        'margin': 24.0,
-        'theme': 'light',
-        'pageLayout': 'vertical',
-      };
-    } catch (e) {
-      print('Error in getReadingSettings: $e');
-      // 发生错误时返回默认设置
-      return {
-        'fontSize': 16.0,
-        'fontFamily': 'System',
-        'lineSpacing': 1.5,
-        'margin': 24.0,
-        'theme': 'light',
-        'pageLayout': 'vertical',
-      };
+    // 如果有全局设置，返回全局设置
+    if (_globalSettings != null) {
+      print('Using global settings: $_globalSettings');
+      return _globalSettings!;
     }
+    
+    // 否则返回默认设置
+    print('Using default settings');
+    return {
+      'fontSize': 16.0,
+      'fontFamily': 'System',
+      'lineSpacing': 1.5,
+      'margin': 24.0,
+      'theme': 'light',
+      'pageLayout': 'scroll',
+    };
   }
 }
